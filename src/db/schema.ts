@@ -14,7 +14,7 @@ export const stores = pgTable("store", {
 		.$onUpdate(() => new Date()),
 });
 
-export const ingredients = pgTable("ingredient", {
+export const items = pgTable("items", {
 	id: serial().primaryKey(),
 	userId: text()
 		.notNull()
@@ -25,6 +25,7 @@ export const ingredients = pgTable("ingredient", {
 		.notNull()
 		.defaultNow()
 		.$onUpdate(() => new Date()),
+	usualStoreId: integer().references(() => stores.id, { onDelete: "set null" }),
 });
 
 export const recipes = pgTable("recipe", {
@@ -34,13 +35,16 @@ export const recipes = pgTable("recipe", {
 		.references(() => user.id, { onDelete: "cascade" }),
 	title: text().notNull(),
 	text: text().notNull(),
+	type: text({ enum: ["recurring", "list", "recipe"] })
+		.notNull()
+		.default("recipe"),
 });
 
-export const mealPlanRecipe = pgTable("meal_plan_recipe", {
-	userId: text()
-		.primaryKey()
-		.references(() => user.id, { onDelete: "cascade" }),
+export const mealPlanEntry = pgTable("meal_plan_entry", {
+	id: serial().primaryKey(),
+	userId: text().references(() => user.id, { onDelete: "cascade" }),
 	recipeId: integer().references(() => recipes.id, { onDelete: "cascade" }),
+	sideItem: integer().references(() => items.id, { onDelete: "set null" }),
 });
 
 export const storeListItem = pgTable("store_list_item", {
@@ -49,7 +53,8 @@ export const storeListItem = pgTable("store_list_item", {
 		.notNull()
 		.references(() => stores.id, { onDelete: "cascade" }),
 	text: text().notNull(),
-	ingredientId: integer().references(() => ingredients.id, {
-		onDelete: "cascade",
+	shoppingNote: text(),
+	itemId: integer().references(() => items.id, {
+		onDelete: "set null",
 	}),
 });

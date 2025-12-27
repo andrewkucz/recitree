@@ -10,6 +10,7 @@ import { DialogDrawer } from "@/components/DialogDrawer";
 import { NavBackButton } from "@/components/NavBackButton";
 import { PageLayout } from "@/components/PageLayout";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { StoreForm } from "@/features/stores/components/store-form";
 import { createStore, getStoresQueryOptions } from "@/features/stores/data";
 import { authPageMiddleware } from "@/middleware/auth";
@@ -66,11 +67,11 @@ function App() {
 				</>
 			}
 		>
-			<div className="space-y-4">
+			<div className="space-y-3">
 				{stores.map((store) => (
-					<div key={store.id} className="bg-background p-1">
+					<Card key={store.id} className="bg-background p-2 rounded-md">
 						{store.name}
-					</div>
+					</Card>
 				))}
 			</div>
 		</PageLayout>

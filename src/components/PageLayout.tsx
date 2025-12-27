@@ -4,10 +4,12 @@ export function PageLayout({
 	children,
 	header,
 	title,
+	className,
 }: {
 	children: React.ReactNode;
 	header?: React.ReactNode;
 	title?: string;
+	className?: string;
 }) {
 	return (
 		<>
@@ -16,7 +18,7 @@ export function PageLayout({
 					{header}
 				</header>
 			)}
-			<main className={cn("p-6", { "pt-16": !!header })}>
+			<main className={cn("p-6", className, { "pt-16": !!header })}>
 				{title ? <h1 className="text-xl font-bold mb-2">{title}</h1> : null}
 				{children}
 			</main>
