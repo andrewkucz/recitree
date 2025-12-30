@@ -9,22 +9,21 @@ import {
 	Link,
 	stripSearchParams,
 } from "@tanstack/react-router";
-import { PlusIcon, StoreIcon } from "lucide-react";
+import {
+	CalendarDaysIcon,
+	CircleEllipsisIcon,
+	CogIcon,
+	PlusIcon,
+	ScrollTextIcon,
+	StoreIcon,
+} from "lucide-react";
 import { useState } from "react";
 import z from "zod";
 import { DialogDrawer } from "@/components/DialogDrawer";
+import { ListItem } from "@/components/ListItem";
 import { PageLayout } from "@/components/PageLayout";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-	ContextMenu,
-	ContextMenuContent,
-	ContextMenuItem,
-	ContextMenuSub,
-	ContextMenuSubContent,
-	ContextMenuSubTrigger,
-	ContextMenuTrigger,
-} from "@/components/ui/context-menu";
+import { ButtonGroup } from "@/components/ui/button-group";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -44,6 +43,7 @@ import {
 } from "@/features/items/data";
 import { getStoresQueryOptions, type Store } from "@/features/stores/data";
 import { authPageMiddleware } from "@/middleware/auth";
+import { ActionsMenu } from "@/components/ActionsMenu";
 
 export const Route = createFileRoute("/")({
 	component: App,
@@ -73,7 +73,7 @@ function StoresMenu({
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button size="icon" variant="outline">
+				<Button size="icon-lg" variant="outline">
 					<StoreIcon />
 				</Button>
 			</DropdownMenuTrigger>
@@ -103,6 +103,7 @@ function StoresMenu({
 	);
 }
 
+
 const AddItemButton = ({ storeId }: { storeId: number }) => {
 	const [createDialogOpen, setCreateDialogOpen] = useState(false);
 	const queryClient = useQueryClient();
@@ -128,14 +129,14 @@ const AddItemButton = ({ storeId }: { storeId: number }) => {
 				/>
 			}
 		>
-			<Button size="icon" className="fixed bottom-4 left-4">
+			<Button size="icon-lg" className="fixed bottom-4 left-4">
 				<PlusIcon />
 			</Button>
 		</DialogDrawer>
 	);
 };
 
-export function ListItem({
+function StoreListItemComponent({
 	item,
 	currentStore,
 }: {
@@ -196,55 +197,44 @@ export function ListItem({
 		deleteItem(item.id);
 	};
 
+	const handleStoreUpdate = (storeId: number) => {
+		update({
+			data: {
+				...item,
+				shoppingNote: item.shoppingNote ?? undefined,
+				storeId,
+			},
+		});
+	};
+
 	return (
-		<ContextMenu>
-			<ContextMenuTrigger asChild>
-				<Button
-					variant="card"
-					className="flex items-center h-auto gap-3 p-3"
-					asChild
-				>
-					<label htmlFor={`item-${item.id}`}>
-						<Checkbox
-							checked={item.checked}
-							onCheckedChange={handleCheckChange}
-							id={`item-${item.id}`}
-							className="size-5 rounded-full"
-						/>
-						<div>{item.text}</div>
-					</label>
-				</Button>
-			</ContextMenuTrigger>
-			<ContextMenuContent className="w-52">
-				<ContextMenuItem onSelect={handleRename}>Rename</ContextMenuItem>
-				<ContextMenuItem onSelect={handleDelete} variant="destructive">
-					Delete
-				</ContextMenuItem>
-				<ContextMenuSub>
-					<ContextMenuSubTrigger>Move to Store</ContextMenuSubTrigger>
-					<ContextMenuSubContent className="w-44">
-						{stores
-							.filter((s) => s.id !== currentStore?.id)
-							.map((store) => (
-								<ContextMenuItem
-									key={store.id}
-									onSelect={() =>
-										update({
-											data: {
-												...item,
-												shoppingNote: item.shoppingNote ?? undefined,
-												storeId: store.id,
-											},
-										})
-									}
-								>
-									{store.name}
-								</ContextMenuItem>
-							))}
-					</ContextMenuSubContent>
-				</ContextMenuSub>
-			</ContextMenuContent>
-		</ContextMenu>
+		<ListItem
+			id={`item-${item.id}`}
+			checked={item.checked}
+			onCheckedChange={handleCheckChange}
+			actions={[
+				{
+					label: "Rename",
+					action: handleRename,
+				},
+				{
+					label: "Delete",
+					action: handleDelete,
+					variant: "destructive",
+				},
+				{
+					label: "Move to Store",
+					subActions: stores
+						.filter((s) => s.id !== currentStore?.id)
+						.map((store) => ({
+							label: store.name,
+							action: () => handleStoreUpdate(store.id),
+						})),
+				},
+			]}
+		>
+			{item.text}
+		</ListItem>
 	);
 }
 
@@ -258,12 +248,21 @@ function App() {
 
 	return (
 		<PageLayout
-			header={<StoresMenu stores={stores} selected={s} />}
+			header={
+				<>
+					<StoresMenu stores={stores} selected={s} />
+					<ActionsMenu />
+				</>
+			}
 			title={selectedStore?.name}
 		>
 			<div className="space-y-3">
 				{data?.map((item) => (
-					<ListItem key={item.id} item={item} currentStore={selectedStore} />
+					<StoreListItemComponent
+						key={item.id}
+						item={item}
+						currentStore={selectedStore}
+					/>
 				))}
 			</div>
 			{selectedStore ? <AddItemButton storeId={selectedStore.id} /> : null}

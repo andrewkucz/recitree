@@ -37,6 +37,7 @@ export function DialogDrawer({
 	open?: boolean;
 	onOpenChange?: (open: boolean) => void;
 }) {
+	const _drawerContentRef = React.useRef<HTMLDivElement>(null);
 	const [internalOpen, setInternalOpen] = React.useState(propsOpen ?? false);
 	const open = typeof propsOpen !== "undefined" ? propsOpen : internalOpen;
 	const onOpenChange =
@@ -44,6 +45,16 @@ export function DialogDrawer({
 			? propsOnOpenChange
 			: setInternalOpen;
 	const isDesktop = useMediaQuery("(min-width: 768px)");
+
+	const drawerContentAutoFocusRef = React.useCallback(
+		(ref: HTMLDivElement | null) => {
+			if (!ref || !open) return;
+			setTimeout(() => {
+				ref.querySelector("input")?.focus();
+			}, 0);
+		},
+		[open],
+	);
 
 	if (isDesktop) {
 		return (
@@ -65,7 +76,10 @@ export function DialogDrawer({
 	return (
 		<Drawer open={open} onOpenChange={onOpenChange}>
 			{children ? <DrawerTrigger asChild>{children}</DrawerTrigger> : null}
-			<DrawerContent className="px-6 [&_button[type=submit]]:w-full">
+			<DrawerContent
+				ref={drawerContentAutoFocusRef}
+				className="px-6 [&_button[type=submit]]:w-full"
+			>
 				<DrawerHeader className="text-left">
 					<DrawerTitle>{title}</DrawerTitle>
 					{description ? (

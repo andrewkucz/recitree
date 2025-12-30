@@ -42,9 +42,7 @@ export const recipes = pgTable("recipe", {
 		.references(() => user.id, { onDelete: "cascade" }),
 	title: text().notNull(),
 	text: text().notNull(),
-	type: text({ enum: ["recurring", "list", "recipe"] })
-		.notNull()
-		.default("recipe"),
+	type: text({ enum: ["list", "item", "meal"] }).notNull(),
 });
 
 export const mealPlanEntry = pgTable("meal_plan_entry", {

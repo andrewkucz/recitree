@@ -7,10 +7,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { DialogDrawer } from "@/components/DialogDrawer";
+import { ListItem } from "@/components/ListItem";
 import { NavBackButton } from "@/components/NavBackButton";
 import { PageLayout } from "@/components/PageLayout";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { StoreForm } from "@/features/stores/components/store-form";
 import { createStore, getStoresQueryOptions } from "@/features/stores/data";
 import { authPageMiddleware } from "@/middleware/auth";
@@ -69,9 +69,9 @@ function App() {
 		>
 			<div className="space-y-3">
 				{stores.map((store) => (
-					<Card key={store.id} className="bg-background p-2 rounded-md">
+					<ListItem key={store.id} id={store.id}>
 						{store.name}
-					</Card>
+					</ListItem>
 				))}
 			</div>
 		</PageLayout>
