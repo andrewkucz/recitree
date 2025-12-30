@@ -10,4 +10,5 @@ export const createStoreListItemSchema = z.object({
 
 export const editStoreListItemSchema = createStoreListItemSchema.extend({
 	id: z.number(),
+	checked: z.boolean(),
 });

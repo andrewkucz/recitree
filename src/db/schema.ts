@@ -1,4 +1,11 @@
-import { integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import {
+	boolean,
+	integer,
+	pgTable,
+	serial,
+	text,
+	timestamp,
+} from "drizzle-orm/pg-core";
 import { user } from "./auth-schema";
 
 export const stores = pgTable("store", {
@@ -57,4 +64,5 @@ export const storeListItem = pgTable("store_list_item", {
 	itemId: integer().references(() => items.id, {
 		onDelete: "set null",
 	}),
+	checked: boolean().notNull().default(false),
 });
