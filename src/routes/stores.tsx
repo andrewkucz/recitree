@@ -10,7 +10,12 @@ import { DialogDrawer } from "@/components/DialogDrawer";
 import { ListItem } from "@/components/ListItem";
 import { NavBackButton } from "@/components/NavBackButton";
 import { PageLayout } from "@/components/PageLayout";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+	getSettingsQueryOptions,
+	updateSettings,
+} from "@/features/settings/data";
 import { StoreForm } from "@/features/stores/components/store-form";
 import { createStore, getStoresQueryOptions } from "@/features/stores/data";
 import { authPageMiddleware } from "@/middleware/auth";
@@ -22,6 +27,7 @@ export const Route = createFileRoute("/stores")({
 	},
 	loader: async ({ context }) => {
 		await context.queryClient.ensureQueryData(getStoresQueryOptions());
+		await context.queryClient.ensureQueryData(getSettingsQueryOptions());
 	},
 });
 
@@ -57,6 +63,18 @@ const AddStoreButton = () => {
 function App() {
 	const { data: stores } = useSuspenseQuery(getStoresQueryOptions());
 
+	const { data: userSettings } = useSuspenseQuery(getSettingsQueryOptions());
+	const queryClient = useQueryClient();
+	const { mutate: updateDefaultStore } = useMutation({
+		mutationFn: (storeId: number) =>
+			updateSettings({ data: { defaultStore: storeId } }),
+		onSuccess() {
+			queryClient.invalidateQueries({
+				queryKey: getSettingsQueryOptions().queryKey,
+			});
+		},
+	});
+
 	return (
 		<PageLayout
 			title="Stores"
@@ -69,8 +87,21 @@ function App() {
 		>
 			<div className="space-y-3">
 				{stores.map((store) => (
-					<ListItem key={store.id} id={store.id}>
-						{store.name}
+					<ListItem
+						key={store.id}
+						id={store.id}
+						actions={[
+							{
+								label: "Set as default",
+								action: () => updateDefaultStore(store.id),
+								disabled: store.id === userSettings.defaultStore,
+							},
+						]}
+					>
+						<div>{store.name}</div>
+						{store.id === userSettings.defaultStore ? (
+							<Badge variant="secondary">Default</Badge>
+						) : null}
 					</ListItem>
 				))}
 			</div>

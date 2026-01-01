@@ -64,3 +64,10 @@ export const storeListItem = pgTable("store_list_item", {
 	}),
 	checked: boolean().notNull().default(false),
 });
+
+export const userSetting = pgTable("user_setting", {
+	userId: text()
+		.primaryKey()
+		.references(() => user.id, { onDelete: "cascade" }),
+	defaultStore: integer().references(() => stores.id, { onDelete: "set null" }),
+});

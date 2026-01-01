@@ -15,6 +15,7 @@ export type ListItemAction =
 			label: string;
 			action: () => void;
 			variant?: "destructive";
+			disabled?: boolean;
 	  }
 	| {
 			label: string;
@@ -91,6 +92,7 @@ export function ListItem({
 												key={action.label}
 												onSelect={action.action}
 												variant={action.variant}
+												disabled={action.disabled}
 											>
 												{action.label}
 											</ContextMenuItem>
@@ -106,6 +108,7 @@ export function ListItem({
 							key={a.label}
 							onSelect={a.action}
 							variant={a.variant}
+							disabled={a.disabled}
 						>
 							{a.label}
 						</ContextMenuItem>

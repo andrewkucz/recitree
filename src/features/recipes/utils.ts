@@ -4,12 +4,15 @@ type RecipeItem = {
 	name: string;
 	amount: string | undefined;
 	prep: string | undefined;
+	id: number;
 };
 
 export function parseRecipe(text: string) {
 	let name: string | undefined;
 
 	const items: RecipeItem[] = [];
+
+	let id = 1;
 
 	marked.parse(text, {
 		walkTokens(token) {
@@ -22,12 +25,13 @@ export function parseRecipe(text: string) {
 				if (!name) {
 					throw new Error("Item name not found");
 				}
-
 				items.push({
+					id,
 					name,
 					amount,
 					prep,
 				});
+				id++;
 			}
 		},
 	});
