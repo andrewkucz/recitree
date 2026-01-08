@@ -23,10 +23,7 @@ export const Route = createFileRoute("/recipes")({
 function AddToMealPlanForm({ recipe }: { recipe: Recipe }) {
 	const [selected, setSelected] = useState({} as Record<number, boolean>);
 
-	const { name, items } = useMemo(
-		() => parseRecipe(recipe.text),
-		[recipe.text],
-	);
+	const { items } = useMemo(() => parseRecipe(recipe.text), [recipe.text]);
 
 	return (
 		<div>
@@ -92,6 +89,7 @@ function Recipes() {
 			<DialogDrawer
 				open={open}
 				onOpenChange={onOpenChange}
+				fullHeight
 				title={selected?.title ?? "Add to meal plan"}
 				content={selected ? <AddToMealPlanForm recipe={selected} /> : null}
 			/>

@@ -1,18 +1,15 @@
 import { marked } from "marked";
 
-type RecipeItem = {
+type RecipeIngredient = {
 	name: string;
 	amount: string | undefined;
 	prep: string | undefined;
-	id: number;
 };
 
 export function parseRecipe(text: string) {
 	let name: string | undefined;
 
-	const items: RecipeItem[] = [];
-
-	let id = 1;
+	const ingredients: RecipeIngredient[] = [];
 
 	marked.parse(text, {
 		walkTokens(token) {
@@ -25,13 +22,11 @@ export function parseRecipe(text: string) {
 				if (!name) {
 					throw new Error("Item name not found");
 				}
-				items.push({
-					id,
+				ingredients.push({
 					name,
 					amount,
 					prep,
 				});
-				id++;
 			}
 		},
 	});
@@ -40,5 +35,9 @@ export function parseRecipe(text: string) {
 		throw new Error("No main heading found");
 	}
 
-	return { name, items };
+	const items = [...new Set(ingredients.map((i) => i.name)).values()].map(
+		(name, id) => ({ id, name }),
+	);
+
+	return { name, ingredients, items };
 }

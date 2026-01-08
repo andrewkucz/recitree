@@ -21,6 +21,7 @@ import {
 	DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { cn } from "@/lib/utils";
 
 export function DialogDrawer({
 	title,
@@ -29,6 +30,7 @@ export function DialogDrawer({
 	children,
 	open: propsOpen,
 	onOpenChange: propsOnOpenChange,
+	fullHeight,
 }: {
 	title: string;
 	description?: string;
@@ -36,8 +38,8 @@ export function DialogDrawer({
 	children?: React.ReactNode;
 	open?: boolean;
 	onOpenChange?: (open: boolean) => void;
+	fullHeight?: boolean;
 }) {
-	const _drawerContentRef = React.useRef<HTMLDivElement>(null);
 	const [internalOpen, setInternalOpen] = React.useState(propsOpen ?? false);
 	const open = typeof propsOpen !== "undefined" ? propsOpen : internalOpen;
 	const onOpenChange =
@@ -78,7 +80,12 @@ export function DialogDrawer({
 			{children ? <DrawerTrigger asChild>{children}</DrawerTrigger> : null}
 			<DrawerContent
 				ref={drawerContentAutoFocusRef}
-				className="px-6 [&_button[type=submit]]:w-full"
+				className={cn(
+					"px-6 max-h-full overflow-auto [&_button[type=submit]]:w-full",
+					{
+						"min-h-screen": fullHeight,
+					},
+				)}
 			>
 				<DrawerHeader className="text-left">
 					<DrawerTitle>{title}</DrawerTitle>
